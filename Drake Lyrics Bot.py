@@ -28,32 +28,35 @@ songs_list_clean = [song_title.split('-drake',1)[0].replace('searcht:','') +
 print(f'After Cleaning: {songs_list_clean[0:2]}')
 print(f'The Number of songs on the first page of MetroLyris: {len(songs_list_clean)}')
 
-# **** Part 1 **** #  Select a Random Song
-x=0
-while x < 90:
-    value = random.choice(range(0,90))
+
+
+while True:
+    dirty_verse = []
+    clean_verse = []
+    linez = []
+    # ****** Part 1 ******* #
+    #Select a random Drake song from MetroLyris
+    value = random.choice(np.arange(0,len(songs_list_clean)))
     song_to_chose = songs_list_clean[value]
-    x +=1
-r = requests.get(f'http://www.metrolyrics.com/{song_to_chose}.html').content
-soup = BeautifulSoup(r, 'html.parser')
-verse = soup.find_all("p",class_="verse")
+    r = requests.get(f'http://www.metrolyrics.com/{song_to_chose}.html').content
+    soup = BeautifulSoup(r, 'html.parser')
+    verse = soup.find_all("p",class_='verse')
+    #Remove Html Tags From Chosen Song
+    for tags in verse:
+        dirty_verse.append(tags.text.strip())
+        #Dirty_verse is Now a List of Lists with a Drake Verse
+        for lists in dirty_verse:
+            clean_verse.append(lists.replace('\n',' ').split(','))
+            #Replace Line Breaks From Dirty_verse To Empty & Clean Stuff Up
+            for multiples in clean_verse:
+                #Break Up The List of Lists into 1 List with individual Lines
+                for lines in multiples:
+                    linez.append(lines)
 
-# Remove Html Tags From Chosen Song
-versez = []
-verses = []
-for tags in verse:
-    versez.append(tags.text.strip())
-    for lists in versez:
-        verses.append(lists.replace('\n',' ').split(',')) #Replace Line Breaks From Versez To Nothing and split lines by commas
-
-# **** Part 2 **** #  Selecting a Random Line
-
-linez = []
-for multiples in verses:
-    for lines in multiples:
-        linez.append(lines)
-# Random Line
-while x < len(linez):
-    line_value = random.choice(range(0,len(linez)))
-    x +=1
-twitter.update_status(status=linez[line_value].upper())
+    # ****** Part 2 ******* #
+    #Select a random line from verse of corresponding song
+    #Generate a random number based on the number of lines in the verse
+    line_value = random.choice(np.arange(0,len(linez)))
+    print(linez[line_value])
+    twitter.update_status(status=line_to_print.upper())
+    time.sleep(5)
